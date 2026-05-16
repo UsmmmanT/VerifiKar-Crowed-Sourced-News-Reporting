@@ -1,3 +1,10 @@
+# Final Year Project Fast(NUCES) Karachi
+
+Contributors:
+22k-4478 Usman Tanveer
+22k-4473 Jaswant lal
+22k-4641 Muhammad Huzaifa
+
 # VerifiKar
 
 VerifiKar is a location-aware civic incident verification system with a FastAPI backend, background worker, model server, and a React Native (Expo) mobile app.
