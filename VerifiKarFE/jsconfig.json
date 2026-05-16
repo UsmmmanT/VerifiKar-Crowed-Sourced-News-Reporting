@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "components/*": ["./components/*"],
+      "screens/*": ["./screens/*"],
+      "assets/*": ["./assets/*"],
+      "styles/*": ["./styles/*"]
+    }
+  }
+}

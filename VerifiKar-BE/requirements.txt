@@ -1,0 +1,53 @@
+# FastAPI Server
+fastapi==0.120.0
+uvicorn[standard]==0.38.0
+python-multipart==0.0.20
+
+# Database (SQLAlchemy ORM)
+sqlalchemy[asyncio]==2.0.44
+asyncpg>=0.30.0
+alembic==1.17.0
+
+# DB Extensions
+pgvector==0.4.1
+GeoAlchemy2==0.18.0
+
+# Security & Auth
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-jose[cryptography]==3.5.0
+
+# Cloudflare R2 (S3-compatible) client
+boto3==1.40.69
+
+# Background Task Queue (ARQ)
+arq==0.26.3
+redis==5.3.1
+
+# ML/AI Pipeline Dependencies
+google-generativeai==0.8.5
+groq==0.4.2
+transformers==4.57.1
+torch==2.9.0
+torchvision==0.24.0
+Pillow==12.0.0
+opencv-python-headless==4.12.0.88
+numpy==2.2.6
+requests==2.32.5
+git+https://github.com/openai/CLIP.git
+
+# Utilities
+python-dotenv==1.1.1
+psycopg2-binary==2.9.11
+pydantic-settings==2.11.0
+aiofiles==25.1.0
+email-validator==2.3.0
+tenacity==9.0.0
+slowapi==0.1.9
+httpx==0.27.2
+shapely==2.1.2
+
+# Additional dependencies
+watchfiles==1.1.1
+
+firebase-admin==6.2.0

@@ -1,0 +1,229 @@
+import json
+import google.generativeai as genai
+from app.core.config import settings
+from typing import Dict, Any, List # <-- Make sure List is imported
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log
+)
+import logging
+
+logger = logging.getLogger(__name__)
+
+# 1. CONFIGURE GEMINI API KEY (GLOBAL)
+try:
+    genai.configure(api_key=settings.GOOGLE_API_KEY)
+    logger.info("Gemini API configured successfully")
+except Exception as e:
+    logger.critical(f"Failed to configure Gemini API: {e}", exc_info=True)
+
+MODEL_NAME = "models/gemma-3-4b"  # Using Gemma 3 4B: 30 RPM, 14.4K RPD
+
+# --- TEXT CLEANING AND EVENT CATEGORIZATION PROMPT ---
+SYSTEM_PROMPT = """
+You are a text processor. Your job: translate mixed-language text to English and categorize it.
+
+INPUT: Text in English/Urdu/Roman Urdu/Hindi mix.
+OUTPUT: JSON only. No markdown, no explanation, no extra text.
+
+STEPS:
+1. Translate all text to clear English
+2. Keep facts exact (locations, numbers, times)
+3. Remove emotions but keep event details
+4. Pick ONE category from this list:
+
+Fire - fire, explosion, blast, burning, flames, smoke
+Accident - car crash, collision, vehicle accident, injury
+Traffic - traffic jam, road blocked, congestion, route closed
+Crime - theft, robbery, violence, assault, kidnapping, murder
+Protest - demonstration, rally, strike, march, sit-in, dharna
+Disaster - earthquake, flood, landslide, tsunami, cyclone
+Infrastructure - building collapse, bridge damage, road damage
+Outage - no electricity, no water, no gas, power failure, blackout
+Health - disease, epidemic, hospital emergency, medical crisis
+Environment - pollution, toxic leak, chemical spill, contamination
+Rescue - rescue operation, emergency response, help needed
+Weather - rain, storm, heatwave, flooding, heavy rainfall
+Politics - political event, government action, policy announcement
+Social - community issue, social campaign, public gathering
+Spam / Ad - advertisement, promotion, spam, commercial content
+Other - anything else
+
+OUTPUT FORMAT (exactly this structure):
+{"cleaned_text":"your translated text here","event_category":"category name"}
+
+RULES:
+- NO markdown code blocks
+- NO ```json wrapper
+- NO explanations before or after
+- ONLY valid JSON
+- category name MUST match list exactly (case-sensitive)
+
+EXAMPLE:
+Input: "Bhai DHA mein baarish bohot zyada hai roads pe pani bhar gaya"
+Output: {"cleaned_text":"Heavy rain in DHA area. Roads are flooded with water.","event_category":"Weather"}
+"""
+
+
+# --- TEXT CLEANING AND EVENT CATEGORIZATION MODEL ---
+try:
+    GEMINI_MODEL = genai.GenerativeModel(
+        MODEL_NAME,
+        system_instruction=SYSTEM_PROMPT
+    )
+    logger.info("Gemini model (text_service) initialized globally")
+except Exception as e:
+    logger.critical(f"Failed to initialize Gemini model: {e}", exc_info=True)
+    GEMINI_MODEL = None
+
+
+# --- SUMMARIZATION PROMPT ---
+SUMMARIZATION_PROMPT = """
+You are a calm and professional news writer.
+
+Your job is to read a list of short, crowd-sourced incident reports (which may include emotional language, repetition, or mixed languages) and produce **one clear, factual, and human-sounding paragraph** that summarizes the event.
+
+---
+
+### Style & Quality Rules
+1. **Write like a human reporter:** Use natural phrasing and balanced punctuation. Avoid AI-like patterns — no em-dashes (—), no unnecessary commas, and no overuse of words like “reportedly” or “appears.”
+2. **Synthesize, Don’t List:** Merge all overlapping details into one coherent account. Never enumerate or repeat the reports.
+3. **Stay Factual & Neutral:** Include only information that appears in the reports. No speculation, opinions, or emotional language.
+4. **Find the Consensus:** Focus on the main event described by most reports. If five mention a fire and one mentions traffic, summarize the fire.
+5. **Avoid Repetition:** Combine duplicates or similar statements (e.g., multiple mentions of a “fire at Empress Market” → mention once).
+6. **Be Concise:** Keep the summary short — 1–3 sentences that read smoothly.
+7. **Output Format:** Return only the plain English paragraph. No JSON, markdown, or extra text.
+
+---
+
+### Example Input
+[
+  "There is a massive fire at Empress Market!!",
+  "omg saddar is on fire i can see smoke",
+  "Aag lag gayi Empress Market mein!",
+  "firecracker shop exploded, Hamdard Hospital windows broken"
+]
+
+### Example Output
+A fire has broken out at Empress Market in Saddar. One report mentions an explosion at a firecracker shop that damaged windows at the nearby Hamdard Hospital.
+"""
+
+
+# --- SUMMARIZATION MODEL ---
+try:
+    SUMMARIZATION_MODEL = genai.GenerativeModel(
+        MODEL_NAME,
+        system_instruction=SUMMARIZATION_PROMPT
+    )
+    logger.info("Gemini model (summarization_service) initialized globally")
+except Exception as e:
+    logger.critical(f"Failed to initialize Summarization model: {e}", exc_info=True)
+    SUMMARIZATION_MODEL = None
+
+# --- FUNCTIONS ---
+
+@retry(
+    retry=retry_if_exception_type((Exception,)),
+    stop=stop_after_attempt(2),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    reraise=True
+)
+async def _call_gemini_with_retry(model, prompt: str) -> str:
+    """
+    Internal function that wraps Gemini API calls with retry logic.
+    Retries up to 2 times with exponential backoff (2s, 4s).
+    Timeout: 45s per request (Gemini API can take 20-25s).
+    """
+    from google.generativeai.types import GenerationConfig
+    
+    # Configure with 45s timeout
+    response = await model.generate_content_async(
+        prompt,
+        request_options={"timeout": 45}
+    )
+    return response.text.strip()
+
+async def clean_and_categorize_text(text: str) -> Dict[str, str] | None:
+    """
+    Cleans and categorizes text using the (now global) Gemini API model.
+    
+    Returns:
+        A dict {"cleaned_text": "...", "event_category": "..."} or None.
+    
+    Includes retry logic - will retry up to 2 times on failures.
+    Timeout: 45s per request (handles slow Gemini responses).
+    """
+    
+    if not GEMINI_MODEL:
+        logger.error("Text Service: Model not initialized, cannot process text")
+        return None
+        
+    text = text.strip()
+    if not text:
+        return None
+
+    try:
+        # Use retry wrapper for API call
+        cleaned_output = await _call_gemini_with_retry(
+            GEMINI_MODEL,
+            f"Input: \"{text}\""
+        )
+        
+        # Clean potential markdown fences
+        if cleaned_output.startswith("```json"):
+            cleaned_output = cleaned_output[7:]
+        if cleaned_output.endswith("```"):
+            cleaned_output = cleaned_output[:-3]
+        
+        cleaned_output = cleaned_output.strip()
+
+        # Parse the JSON string into a Python dict
+        result = json.loads(cleaned_output)
+        
+        if not isinstance(result, dict) or "cleaned_text" not in result or "event_category" not in result:
+            logger.error(f"Invalid JSON structure from model: {cleaned_output}")
+            return None
+            
+        return result
+
+    except Exception as e:
+        logger.error(f"Error during Gemini API call (after retries): {e}", exc_info=True)
+        return None
+
+async def summarize_reports(reports: List[str]) -> str | None:
+    """
+    Summarizes a list of cleaned report texts into a single paragraph.
+    
+    Includes retry logic - will retry up to 2 times on failures.
+    Timeout: 45s per request (handles slow Gemini responses).
+    """
+    if not SUMMARIZATION_MODEL:
+        logger.error("Summarization Service: Model not initialized")
+        return None
+    
+    if not reports:
+        return "No summary available."
+
+    try:
+        # Create a single prompt string from the list
+        prompt_input = f"Input Reports:\n{reports}"
+        
+        # Use retry wrapper for API call
+        summary = await _call_gemini_with_retry(
+            SUMMARIZATION_MODEL,
+            prompt_input
+        )
+        
+        # Basic cleanup
+        if summary.startswith('"') and summary.endswith('"'):
+            summary = summary[1:-1]
+            
+        return summary
+
+    except Exception as e:
+        logger.error(f"Error during Gemini API call (after retries): {e}", exc_info=True)
+        return None

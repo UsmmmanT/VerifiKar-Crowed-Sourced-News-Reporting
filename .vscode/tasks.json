@@ -1,0 +1,90 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "VerifiKar: API",
+      "type": "shell",
+      "command": "if (Test-Path .\\.venv\\Scripts\\Activate.ps1) { . .\\.venv\\Scripts\\Activate.ps1 } elseif (Test-Path .\\venv\\Scripts\\Activate.ps1) { . .\\venv\\Scripts\\Activate.ps1 }; uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
+      "options": {
+        "cwd": "${workspaceFolder}/VerifiKar-BE"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "verifikar-services"
+      }
+    },
+    {
+      "label": "VerifiKar: Worker",
+      "type": "shell",
+      "command": "if (Test-Path .\\.venv\\Scripts\\Activate.ps1) { . .\\.venv\\Scripts\\Activate.ps1 } elseif (Test-Path .\\venv\\Scripts\\Activate.ps1) { . .\\venv\\Scripts\\Activate.ps1 }; arq app.worker.WorkerSettings",
+      "options": {
+        "cwd": "${workspaceFolder}/VerifiKar-BE"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "verifikar-services"
+      }
+    },
+    {
+      "label": "VerifiKar: Model",
+      "type": "shell",
+      "command": "if (Test-Path .\\.venv\\Scripts\\Activate.ps1) { . .\\.venv\\Scripts\\Activate.ps1 } elseif (Test-Path .\\venv\\Scripts\\Activate.ps1) { . .\\venv\\Scripts\\Activate.ps1 }; uvicorn app.services.model_server:app --host 0.0.0.0 --port 8001",
+      "options": {
+        "cwd": "${workspaceFolder}/VerifiKar-BE"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "verifikar-services"
+      }
+    },
+    {
+      "label": "VerifiKar: Frontend",
+      "type": "shell",
+      "command": "npm start",
+      "options": {
+        "cwd": "${workspaceFolder}/VerifiKarFE"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "verifikar-services"
+      }
+    },
+    {
+      "label": "VerifiKar: Start All 4",
+      "dependsOn": [
+        "VerifiKar: API",
+        "VerifiKar: Worker",
+        "VerifiKar: Model",
+        "VerifiKar: Frontend"
+      ],
+      "dependsOrder": "parallel",
+      "runOptions": {
+        "reevaluateOnRerun": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "VerifiKar: Close All Terminals",
+      "type": "shell",
+      "command": "${workspaceFolder}/close-all-terminals.ps1",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "group": "verifikar-services"
+      }
+    }
+  ]
+}

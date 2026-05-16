@@ -1,0 +1,19 @@
+[MASTER]
+ignore=.venv,venv,node_modules,__pycache__
+
+[MESSAGES CONTROL]
+disable=
+    broad-exception-caught,
+    logging-fstring-interpolation,
+    no-member,
+    raise-missing-from
+
+[TYPECHECK]
+extension-pkg-allow-list=cv2
+
+[FORMAT]
+max-line-length=120
+
+[DESIGN]
+max-args=10
+max-locals=25

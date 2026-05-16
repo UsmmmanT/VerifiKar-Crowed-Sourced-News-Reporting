@@ -1,0 +1,244 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary)}
+.screen{max-width:390px;margin:0 auto;background:var(--color-background-tertiary);padding-bottom:40px}
+.top-bar{background:var(--color-background-primary);padding:16px 16px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.search-row{display:flex;align-items:center;gap:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:10px 14px;margin-bottom:14px}
+.search-row span{font-size:14px;color:var(--color-text-tertiary)}
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:14px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.chip{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap;border:1.5px solid transparent;cursor:pointer}
+.chip.active{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.chip.inactive{background:var(--color-background-secondary);color:var(--color-text-secondary);border-color:var(--color-border-tertiary)}
+.chip-dot{width:7px;height:7px;border-radius:50%}
+.section{padding:20px 16px 0}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.see-all{font-size:12px;color:#1D9E75;font-weight:500;cursor:pointer}
+.h-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.h-scroll::-webkit-scrollbar{display:none}
+
+.topic-card{flex-shrink:0;width:130px;border-radius:var(--border-radius-lg);overflow:hidden;cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.card-img{width:130px;height:88px;display:flex;align-items:center;justify-content:center;position:relative}
+.card-body{padding:8px 10px 10px}
+.card-label{font-size:12px;font-weight:500;color:var(--color-text-primary);display:block}
+.card-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.card-badge{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;padding:2px 6px;border-radius:999px}
+
+.loc-card{flex-shrink:0;width:160px;border-radius:var(--border-radius-lg);overflow:hidden;cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.loc-img{width:160px;height:100px;display:flex;align-items:center;justify-content:center;position:relative}
+.loc-body{padding:8px 10px 10px}
+.map-pin{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+
+.fire-bg{background:linear-gradient(135deg,#F0997B,#D85A30)}
+.traffic-bg{background:linear-gradient(135deg,#FAC775,#BA7517)}
+.crime-bg{background:linear-gradient(135deg,#AFA9EC,#534AB7)}
+.accident-bg{background:linear-gradient(135deg,#85B7EB,#185FA5)}
+.rescue-bg{background:linear-gradient(135deg,#5DCAA5,#0F6E56)}
+.weather-bg{background:linear-gradient(135deg,#B5D4F4,#378ADD)}
+.protest-bg{background:linear-gradient(135deg,#ED93B1,#993556)}
+.outage-bg{background:linear-gradient(135deg,#D3D1C7,#5F5E5A)}
+.disaster-bg{background:linear-gradient(135deg,#F7C1C1,#A32D2D)}
+.infra-bg{background:linear-gradient(135deg,#C0DD97,#3B6D11)}
+.loc1{background:linear-gradient(135deg,#AFA9EC,#3C3489)}
+.loc2{background:linear-gradient(135deg,#9FE1CB,#085041)}
+.loc3{background:linear-gradient(135deg,#F5C4B3,#993C1D)}
+.loc4{background:linear-gradient(135deg,#F4C0D1,#72243E)}
+.loc5{background:linear-gradient(135deg,#B5D4F4,#0C447C)}
+.loc6{background:linear-gradient(135deg,#FAC775,#633806)}
+
+.divider{height:8px;background:var(--color-background-secondary);margin-top:20px}
+
+.event-card{flex-shrink:0;width:200px;border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);cursor:pointer}
+.event-img{width:200px;height:110px;position:relative;display:flex;align-items:flex-end}
+.event-img-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+.event-cat-badge{position:absolute;top:8px;left:8px;font-size:10px;font-weight:500;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,0.55);color:#fff}
+.event-date-badge{position:absolute;top:8px;right:8px;background:var(--color-background-primary);border-radius:var(--border-radius-md);padding:4px 7px;text-align:center}
+.event-date-day{font-size:15px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.event-date-mon{font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.04em}
+.event-body{padding:10px 12px 12px}
+.event-name{font-size:13px;font-weight:500;color:var(--color-text-primary);line-height:1.35}
+.event-loc{display:flex;align-items:center;gap:4px;margin-top:5px;font-size:11px;color:var(--color-text-tertiary)}
+.event-loc svg{flex-shrink:0}
+.event-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--color-border-tertiary)}
+.event-att{font-size:11px;color:var(--color-text-secondary)}
+.event-tag{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:500}
+.tag-live{background:#FCEBEB;color:#791F1F}
+.tag-upcoming{background:#E6F1FB;color:#0C447C}
+.tag-watch{background:#FAEEDA;color:#633806}
+</style>
+
+<div class="screen">
+  <div class="top-bar">
+    <div class="search-row">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--color-text-tertiary);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span>Search incidents, locations...</span>
+    </div>
+    <div class="filter-row">
+      <div class="chip active"><div class="chip-dot" style="background:#fff"></div>All</div>
+      <div class="chip inactive"><div class="chip-dot" style="background:#D85A30"></div>Fire</div>
+      <div class="chip inactive"><div class="chip-dot" style="background:#BA7517"></div>Traffic</div>
+      <div class="chip inactive"><div class="chip-dot" style="background:#185FA5"></div>Accident</div>
+      <div class="chip inactive"><div class="chip-dot" style="background:#534AB7"></div>Crime</div>
+      <div class="chip inactive"><div class="chip-dot" style="background:#0F6E56"></div>Rescue</div>
+      <div class="chip inactive"><div class="chip-dot" style="background:#993556"></div>Protest</div>
+      <div class="chip inactive"><div class="chip-dot" style="background:#A32D2D"></div>Disaster</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Trending topics</span>
+      <span class="see-all">See all</span>
+    </div>
+    <div class="h-scroll">
+      <div class="topic-card"><div class="card-img fire-bg"><span style="font-size:32px">🔥</span><span class="card-badge">42 reports</span></div><div class="card-body"><span class="card-label">Fire</span><span class="card-sub">High activity</span></div></div>
+      <div class="topic-card"><div class="card-img traffic-bg"><span style="font-size:32px">🚦</span><span class="card-badge">89 reports</span></div><div class="card-body"><span class="card-label">Traffic</span><span class="card-sub">Surge now</span></div></div>
+      <div class="topic-card"><div class="card-img crime-bg"><span style="font-size:32px">🚔</span><span class="card-badge">17 reports</span></div><div class="card-body"><span class="card-label">Crime</span><span class="card-sub">Verified</span></div></div>
+      <div class="topic-card"><div class="card-img accident-bg"><span style="font-size:32px">🚗</span><span class="card-badge">31 reports</span></div><div class="card-body"><span class="card-label">Accident</span><span class="card-sub">Multiple zones</span></div></div>
+      <div class="topic-card"><div class="card-img rescue-bg"><span style="font-size:32px">🚑</span><span class="card-badge">8 reports</span></div><div class="card-body"><span class="card-label">Rescue</span><span class="card-sub">Urgent</span></div></div>
+      <div class="topic-card"><div class="card-img weather-bg"><span style="font-size:32px">⛈️</span><span class="card-badge">55 reports</span></div><div class="card-body"><span class="card-label">Weather</span><span class="card-sub">Storm alert</span></div></div>
+      <div class="topic-card"><div class="card-img protest-bg"><span style="font-size:32px">📢</span><span class="card-badge">24 reports</span></div><div class="card-body"><span class="card-label">Protest</span><span class="card-sub">Ongoing</span></div></div>
+      <div class="topic-card"><div class="card-img outage-bg"><span style="font-size:32px">⚡</span><span class="card-badge">13 reports</span></div><div class="card-body"><span class="card-label">Outage</span><span class="card-sub">3 areas</span></div></div>
+      <div class="topic-card"><div class="card-img disaster-bg"><span style="font-size:32px">🌊</span><span class="card-badge">6 reports</span></div><div class="card-body"><span class="card-label">Disaster</span><span class="card-sub">Monitoring</span></div></div>
+      <div class="topic-card"><div class="card-img infra-bg"><span style="font-size:32px">🏗️</span><span class="card-badge">19 reports</span></div><div class="card-body"><span class="card-label">Infrastructure</span><span class="card-sub">Road damage</span></div></div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:8px">
+    <div class="section-header">
+      <span class="section-title">Trending locations</span>
+      <span class="see-all">See all</span>
+    </div>
+    <div class="h-scroll">
+      <div class="loc-card"><div class="loc-img loc1"><div style="text-align:center;color:#fff"><div style="font-size:26px">🏙️</div><div style="font-size:11px;font-weight:500;margin-top:4px">Saddar</div></div><span class="card-badge">34 posts</span></div><div class="loc-body"><span class="card-label">Saddar</span><div class="map-pin"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>Fire · Traffic</div></div></div>
+      <div class="loc-card"><div class="loc-img loc2"><div style="text-align:center;color:#fff"><div style="font-size:26px">🌊</div><div style="font-size:11px;font-weight:500;margin-top:4px">Clifton</div></div><span class="card-badge">28 posts</span></div><div class="loc-body"><span class="card-label">Clifton</span><div class="map-pin"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>Weather · Rescue</div></div></div>
+      <div class="loc-card"><div class="loc-img loc3"><div style="text-align:center;color:#fff"><div style="font-size:26px">🏘️</div><div style="font-size:11px;font-weight:500;margin-top:4px">Gulshan</div></div><span class="card-badge">21 posts</span></div><div class="loc-body"><span class="card-label">Gulshan-e-Iqbal</span><div class="map-pin"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>Crime · Outage</div></div></div>
+      <div class="loc-card"><div class="loc-img loc4"><div style="text-align:center;color:#fff"><div style="font-size:26px">🏢</div><div style="font-size:11px;font-weight:500;margin-top:4px">DHA</div></div><span class="card-badge">18 posts</span></div><div class="loc-body"><span class="card-label">Defence (DHA)</span><div class="map-pin"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>Accident · Traffic</div></div></div>
+      <div class="loc-card"><div class="loc-img loc5"><div style="text-align:center;color:#fff"><div style="font-size:26px">🏭</div><div style="font-size:11px;font-weight:500;margin-top:4px">Korangi</div></div><span class="card-badge">15 posts</span></div><div class="loc-body"><span class="card-label">Korangi</span><div class="map-pin"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>Fire · Infra</div></div></div>
+      <div class="loc-card"><div class="loc-img loc6"><div style="text-align:center;color:#fff"><div style="font-size:26px">🌿</div><div style="font-size:11px;font-weight:500;margin-top:4px">Malir</div></div><span class="card-badge">11 posts</span></div><div class="loc-body"><span class="card-label">Malir</span><div class="map-pin"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>Protest · Weather</div></div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Events near you</span>
+      <span class="see-all">See all</span>
+    </div>
+    <div class="h-scroll">
+
+      <div class="event-card">
+        <div class="event-img" style="background:linear-gradient(135deg,#F0997B,#993C1D)">
+          <div class="event-img-inner">
+            <span style="font-size:32px">🔥</span>
+            <span style="font-size:11px;color:#fff;font-weight:500;opacity:0.9">Fire Safety Drill</span>
+          </div>
+          <span class="event-cat-badge">Fire &amp; Safety</span>
+          <div class="event-date-badge"><div class="event-date-day">14</div><div class="event-date-mon">Apr</div></div>
+        </div>
+        <div class="event-body">
+          <div class="event-name">City-wide fire safety awareness drill</div>
+          <div class="event-loc">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            Karachi Expo Centre, Clifton
+          </div>
+          <div class="event-footer">
+            <span class="event-att">1.2k attending</span>
+            <span class="event-tag tag-upcoming">Upcoming</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-img" style="background:linear-gradient(135deg,#F7C1C1,#A32D2D)">
+          <div class="event-img-inner">
+            <span style="font-size:32px">🚨</span>
+            <span style="font-size:11px;color:#fff;font-weight:500;opacity:0.9">Emergency Response</span>
+          </div>
+          <span class="event-cat-badge">Disaster</span>
+          <div class="event-date-badge"><div class="event-date-day">12</div><div class="event-date-mon">Apr</div></div>
+        </div>
+        <div class="event-body">
+          <div class="event-name">Flood emergency coordination centre open</div>
+          <div class="event-loc">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            Malir Town Hall, Malir
+          </div>
+          <div class="event-footer">
+            <span class="event-att">348 attending</span>
+            <span class="event-tag tag-live">Live now</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-img" style="background:linear-gradient(135deg,#85B7EB,#0C447C)">
+          <div class="event-img-inner">
+            <span style="font-size:32px">🚗</span>
+            <span style="font-size:11px;color:#fff;font-weight:500;opacity:0.9">Road Safety Week</span>
+          </div>
+          <span class="event-cat-badge">Traffic</span>
+          <div class="event-date-badge"><div class="event-date-day">16</div><div class="event-date-mon">Apr</div></div>
+        </div>
+        <div class="event-body">
+          <div class="event-name">National road safety awareness week — Karachi leg</div>
+          <div class="event-loc">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            Shahrae Faisal, Saddar
+          </div>
+          <div class="event-footer">
+            <span class="event-att">520 attending</span>
+            <span class="event-tag tag-upcoming">Upcoming</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-img" style="background:linear-gradient(135deg,#5DCAA5,#04342C)">
+          <div class="event-img-inner">
+            <span style="font-size:32px">🩺</span>
+            <span style="font-size:11px;color:#fff;font-weight:500;opacity:0.9">First Aid Camp</span>
+          </div>
+          <span class="event-cat-badge">Rescue</span>
+          <div class="event-date-badge"><div class="event-date-day">13</div><div class="event-date-mon">Apr</div></div>
+        </div>
+        <div class="event-body">
+          <div class="event-name">Free first aid &amp; CPR training camp</div>
+          <div class="event-loc">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            Aga Khan Hospital, Saddar
+          </div>
+          <div class="event-footer">
+            <span class="event-att">204 attending</span>
+            <span class="event-tag tag-watch">Tomorrow</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-img" style="background:linear-gradient(135deg,#AFA9EC,#26215C)">
+          <div class="event-img-inner">
+            <span style="font-size:32px">📢</span>
+            <span style="font-size:11px;color:#fff;font-weight:500;opacity:0.9">Community Forum</span>
+          </div>
+          <span class="event-cat-badge">Protest</span>
+          <div class="event-date-badge"><div class="event-date-day">18</div><div class="event-date-mon">Apr</div></div>
+        </div>
+        <div class="event-body">
+          <div class="event-name">Public safety community forum — open mic</div>
+          <div class="event-loc">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+            Arts Council, Saddar
+          </div>
+          <div class="event-footer">
+            <span class="event-att">89 attending</span>
+            <span class="event-tag tag-upcoming">Upcoming</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "owner": "usmmmmanT",
+    "name": "VerifiKar",
+    "slug": "verifikar-ui",
+    "version": "1.0.0",
+    "scheme": "verifikar",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "usesCleartextTraffic": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.verifikarui"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to let you share them in reports.",
+          "cameraPermission": "The app needs access to your camera to let you take photos for reports."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow VerifiKar to use your location to show nearby posts.",
+          "locationAlwaysPermission": "Allow VerifiKar to use your location to show nearby posts.",
+          "locationWhenInUsePermission": "Allow VerifiKar to use your location to show nearby posts.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "bc5d4142-4335-41e3-806d-aa7fc1b49489"
+      }
+    }
+  }
+}
